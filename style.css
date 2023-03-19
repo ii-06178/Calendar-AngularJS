@@ -1,0 +1,41 @@
+body {
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+
+.month {
+  width: 100%;
+  text-align: center;
+}
+.month-year {
+  font-size: 25px;
+  font-family: "Roboto";
+}
+.day {
+  color: black;
+}
+.date ul {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  text-align: center;
+  border-style: ridge;
+}
+.calendar {
+  width: 700px;
+  justify-content: center;
+  border-style: solid;
+}
+
+.date ul li {
+  width: calc(100% / 7);
+}
+.dates {
+  display: block;
+  box-sizing: border-box;
+}
+.booking {
+  visibility: hidden;
+  display: flex;
+}
