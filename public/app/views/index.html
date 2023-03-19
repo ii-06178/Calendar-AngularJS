@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+  />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css?family=Roboto"
+  />
+  <body>
+    <div ng-app="Calendar" ng-controller="CalendarCtrl">
+      <div class="calendar">
+        <div class="month">
+          <i
+            class="fa fa-chevron-left"
+            style="font-size: 25px; color: gray"
+            ng-click="oldmonth()"
+          ></i>
+          <span class="month-year"> {{Month+" "+Year}}</span>
+          <i
+            class="fa fa-chevron-right"
+            style="font-size: 25px; color: gray"
+            ng-click="newmonth()"
+          ></i>
+        </div>
+        <div class="date">
+          <ul>
+            <li class="day">Monday</li>
+            <li class="day">Tuesday</li>
+            <li class="day">Wednesday</li>
+            <li class="day">Thursday</li>
+            <li class="day">Friday</li>
+            <li class="day">Saturday</li>
+            <li class="day">Sunday</li>
+          </ul>
+          <ul class="dates">
+            <li class="inactive" ng-repeat="dates in lastmonth">{{dates}}</li>
+            <li
+              ng-repeat="dates in currentmonth"
+              ng-click="reserve(dates,Month)"
+            >
+              {{dates}}
+            </li>
+            <li class="inactive" ng-repeat="dates in nextmonth">{{dates}}</li>
+          </ul>
+        </div>
+      </div>
+      <div class="booking" id="booking">
+        <div>
+          <span>Tenant Name: </span>
+          <input
+            type="text"
+            ng-bind="tenantname"
+            placeholder="Enter your name"
+          />
+        </div>
+        <div>
+          <span>Day: {{dayOfReservation}}</span>
+        </div>
+
+        <button class="confirm" ng-click="submit()">Confirm Stay</button>
+      </div>
+    </div>
+    <script src="assets/js/app.js"></script>
+  </body>
+</html>
