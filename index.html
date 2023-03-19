@@ -15,14 +15,14 @@
       <div class="calendar">
         <div class="month">
           <i
-            class="fa fa-arrow-left"
-            style="font-size: 25px"
+            class="fa fa-chevron-left"
+            style="font-size: 25px; color: gray"
             ng-click="oldmonth()"
           ></i>
           <span class="month-year"> {{Month+" "+Year}}</span>
           <i
-            class="fa fa-arrow-right"
-            style="font-size: 25px"
+            class="fa fa-chevron-right"
+            style="font-size: 25px; color: gray"
             ng-click="newmonth()"
           ></i>
         </div>
@@ -37,16 +37,31 @@
             <li class="day">Sunday</li>
           </ul>
           <ul class="dates">
-            <li ng-repeat="dates in currentmonth" ng-click="reserve()">
+            <li class="inactive" ng-repeat="dates in lastmonth">{{dates}}</li>
+            <li
+              ng-repeat="dates in currentmonth"
+              ng-click="reserve(dates,Month)"
+            >
               {{dates}}
             </li>
+            <li class="inactive" ng-repeat="dates in nextmonth">{{dates}}</li>
           </ul>
         </div>
       </div>
       <div class="booking" id="booking">
-        <input type="text" ng-bind="tenantname" />
-        <span>Day: {{dayOfReservation}}</span>
-        <button ng-click="submit()">Add</button>
+        <div>
+          <span>Tenant Name: </span>
+          <input
+            type="text"
+            ng-bind="tenantname"
+            placeholder="Enter your name"
+          />
+        </div>
+        <div>
+          <span>Day: {{dayOfReservation}}</span>
+        </div>
+
+        <button class="confirm" ng-click="submit()">Confirm Stay</button>
       </div>
     </div>
     <script>
@@ -104,6 +119,7 @@
         ];
         var current = 4;
         var year = 2023;
+
         function leapYear(year, month, days) {
           if (year % 4 == 0) {
             if (month == 1) {
@@ -112,11 +128,45 @@
           }
           return days;
         }
+
+        function listOfLastDates(year, month, days, lastMonthDays, months) {
+          sd = months[month].month + " 1, " + year.toString();
+          startDate = new Date(sd);
+          startDay = startDate.getDay();
+          return Array.from(
+            { length: startDay - 1 },
+            (_, i) => lastMonthDays - i
+          ).reverse();
+        }
+        function listOfNextDates(year, month, days, months) {
+          end = leapYear(year, month, days, months).toString();
+          ed = months[month].month + " " + end + ", " + year.toString();
+          endDate = new Date(ed);
+          endDay = endDate.getDay();
+          left = 7 - endDay;
+          console.log(left);
+          days = Array.from({ length: left }, (_, i) => i + 1);
+          console.log(days);
+          return days;
+        }
         $scope.Month = months[current].month;
         $scope.Year = year;
         $scope.currentmonth = Array.from(
-          { length: months[current].days },
+          { length: leapYear(year, current, months[current].days) },
           (_, i) => i + 1
+        );
+        $scope.lastmonth = listOfLastDates(
+          year,
+          current,
+          months[current].days,
+          months[current - 1].days,
+          months
+        );
+        $scope.nextmonth = listOfNextDates(
+          year,
+          current,
+          months[current].days,
+          months
         );
         $scope.newmonth = function () {
           current = current + 1;
@@ -131,6 +181,19 @@
             { length: leapYear(year, current, months[current].days) },
             (_, i) => i + 1
           );
+          $scope.lastmonth = listOfLastDates(
+            year,
+            current,
+            months[current].days,
+            months[current - 1].days,
+            months
+          );
+          $scope.nextmonth = listOfNextDates(
+            year,
+            current,
+            months[current].days,
+            months
+          );
         };
         $scope.oldmonth = function () {
           current = current - 1;
@@ -144,10 +207,24 @@
             { length: leapYear(year, current, months[current].days) },
             (_, i) => i + 1
           );
+          $scope.lastmonth = listOfLastDates(
+            year,
+            current,
+            months[current].days,
+            months[current - 1].days,
+            months
+          );
+          $scope.nextmonth = listOfNextDates(
+            year,
+            current,
+            months[current].days,
+            months
+          );
         };
-        $scope.reserve = function () {
+        $scope.reserve = function (dates, Month) {
           var book = document.getElementById("booking");
           book.style.visibility = "visible";
+          $scope.dayOfReservation = Month + " " + dates.toString();
         };
         $scope.submit = function () {
           var book = document.getElementById("booking");
