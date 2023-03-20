@@ -1,5 +1,5 @@
 var app = angular.module("Calendar", []);
-app.controller("CalendarCtrl", function ($scope) {
+app.controller("CalendarCtrl", function ($scope, $http) {
   let months = [
     {
       month: "January",
@@ -52,7 +52,7 @@ app.controller("CalendarCtrl", function ($scope) {
   ];
   var current = 4;
   var year = 2023;
-
+  var state = "Confirm Stay";
   function leapYear(year, month, days) {
     if (year % 4 == 0) {
       if (month == 1) {
@@ -159,8 +159,26 @@ app.controller("CalendarCtrl", function ($scope) {
     book.style.visibility = "visible";
     $scope.dayOfReservation = Month + " " + dates.toString();
   };
-  $scope.submit = function () {
+  $scope.submit = function (tennantname) {
     var book = document.getElementById("booking");
     book.style.visibility = "hidden";
+    console.log(tennantname);
+    console.log(new Date($scope.dayOfReservation + ", " + year));
+    $http({
+      method: "POST",
+      url: "/reserve",
+      data: {
+        time: new Date($scope.dayOfReservation + ", " + year).valueOf(),
+        reserved: true,
+        tennantName: tennantname,
+      },
+    }).then(
+      function successCallback(response) {
+        console.log("success");
+      },
+      function errorCallback(response) {
+        console.log("failure");
+      }
+    );
   };
 });

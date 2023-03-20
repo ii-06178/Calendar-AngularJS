@@ -53,7 +53,7 @@
           <span>Tenant Name: </span>
           <input
             type="text"
-            ng-bind="tenantname"
+            ng-model="tennantname"
             placeholder="Enter your name"
           />
         </div>
@@ -61,7 +61,9 @@
           <span>Day: {{dayOfReservation}}</span>
         </div>
 
-        <button class="confirm" ng-click="submit()">Confirm Stay</button>
+        <button class="confirm" ng-click="submit(tennantname)">
+          Confirm Stay
+        </button>
       </div>
     </div>
     <script src="assets/js/app.js"></script>
