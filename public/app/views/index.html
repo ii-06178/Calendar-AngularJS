@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html>
+  <!-- Head -->
+  <!-- Angular Files through CDN -->
+
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.min.js"></script>
+  <!-- Stylesheets and Fonts -->
+
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
@@ -10,9 +15,15 @@
     rel="stylesheet"
     href="https://fonts.googleapis.com/css?family=Roboto"
   />
+  <!-- Body -->
+
   <body>
+    <!-- Angular App Initialized -->
+
     <div ng-app="Calendar" ng-controller="CalendarCtrl">
       <div class="calendar">
+        <!--Calendar Header -->
+
         <div class="month">
           <i
             class="fa fa-chevron-left"
@@ -26,6 +37,8 @@
             ng-click="newmonth()"
           ></i>
         </div>
+        <!-- Days of the Week and Dates -->
+
         <div class="date">
           <ul>
             <li class="day">Sunday</li>
@@ -37,6 +50,12 @@
             <li class="day">Saturday</li>
           </ul>
           <ul class="dates">
+            <!-- Each month will have varying days so using ng-repeat to make lists accordingly -->
+            <!-- Three type of lists being made: -->
+            <!-- 1) List of dates from last month -->
+            <!-- 2) List of dates of the current month -->
+            <!-- 3) List of dates of the next month -->
+
             <li class="inactive" ng-repeat="dates in lastmonth">{{dates}}</li>
             <li
               ng-repeat="dates in currentmonth"
@@ -48,9 +67,13 @@
           </ul>
         </div>
       </div>
+      <!-- A popup message when there is an error -->
+
       <div class="popup" ng-model="popping">
         <span class="popuptext" id="myPopup">{{error}} </span>
       </div>
+      <!-- A box that appears to book a slot-->
+
       <div class="booking" id="booking">
         <div id="input">
           <span>Tenant Name: </span>
@@ -68,12 +91,13 @@
         <div>
           <span>Day: {{dayOfReservation}}</span>
         </div>
-
         <button class="confirm" ng-click="submit(tennantname)" id="button">
           {{Staying}}
         </button>
       </div>
     </div>
+    <!-- Scripts -->
+
     <script src="assets/js/app.js"></script>
   </body>
 </html>

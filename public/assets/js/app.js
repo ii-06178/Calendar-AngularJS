@@ -1,5 +1,10 @@
+// Module and Controller Code
+
 var app = angular.module("Calendar", []);
 app.controller("CalendarCtrl", function ($scope, $http) {
+  // ------------------Initializing Variables----------------------------------
+  // months is an array of objects with month names and number of days each has
+  // This removes the hassle of extra calculation
   let months = [
     {
       month: "January",
@@ -50,10 +55,25 @@ app.controller("CalendarCtrl", function ($scope, $http) {
       days: 31,
     },
   ];
+
+  // current keeps track of the current month
+  // year keeps track of the current year
+  // The code intitializes from December 2019 as the data provided lies along this range
+
   var current = 11;
   var year = 2019;
+
+  // state keeps track if the tennant can either book a slot or cancel the slot
+  // time keeps track of time in unix
+
   var state = "Confirm Stay";
   var time = 0;
+
+  //--------------------Helper Functions-----------------------------------
+
+  // leapYear function checks that if the the year is a leapyear, return an extra day in February,otherwise the days in the month.
+  // The function is generalized for all months to avoid repitition
+
   function leapYear(year, month, days) {
     if (year % 4 == 0) {
       if (month == 1) {
@@ -63,47 +83,65 @@ app.controller("CalendarCtrl", function ($scope, $http) {
     return days;
   }
 
-  function listOfLastDates(year, month, days, lastMonthDays, months) {
+  // listOfLastDates returns a list of dates from last month.
+
+  function listOfLastDates(year, month, lastMonthDays, months) {
     sd = months[month].month + " 1, " + year.toString();
     startDate = new Date(sd);
     startDay = startDate.getDay();
-    console.log(startDay);
     return Array.from(
       { length: startDay },
       (_, i) => lastMonthDays - i
     ).reverse();
   }
+
+  // listOfLastDates returns a list of dates of the next month.
+
   function listOfNextDates(year, month, days, months) {
     end = leapYear(year, month, days, months).toString();
     ed = months[month].month + " " + end + ", " + year.toString();
     endDate = new Date(ed);
     endDay = endDate.getDay();
     left = 6 - endDay;
-    console.log(left);
     days = Array.from({ length: left }, (_, i) => i + 1);
-    console.log(days);
     return days;
   }
+
+  // listOfMonths calls all the list making functions
+  // This saves repitition
+
+  function listOfMonths(year, month, days, months) {
+    $scope.currentmonth = Array.from(
+      { length: leapYear(year, month, days) },
+      (_, i) => i + 1
+    );
+    var prvsmonth = 0;
+    if (month == 0) {
+      prvsmonth = 11;
+    } else {
+      prvsmonth = month - 1;
+    }
+    $scope.lastmonth = listOfLastDates(
+      year,
+      month,
+      months[prvsmonth].days,
+      months
+    );
+
+    $scope.nextmonth = listOfNextDates(year, month, days, months);
+  }
+
+  // --------------------------Assigning Values---------------------------------------
+
   $scope.Month = months[current].month;
   $scope.Year = year;
   $scope.Staying = state;
-  $scope.currentmonth = Array.from(
-    { length: leapYear(year, current, months[current].days) },
-    (_, i) => i + 1
-  );
-  $scope.lastmonth = listOfLastDates(
-    year,
-    current,
-    months[current].days,
-    months[current - 1].days,
-    months
-  );
-  $scope.nextmonth = listOfNextDates(
-    year,
-    current,
-    months[current].days,
-    months
-  );
+  listOfMonths(year, current, months[current].days, months);
+
+  // ------------------------On-Click Functions----------------------------------------
+
+  // newmonth is triggered when the right arrow is clicked to go to the next month
+
   $scope.newmonth = function () {
     current = current + 1;
     if (current == 12) {
@@ -113,29 +151,11 @@ app.controller("CalendarCtrl", function ($scope, $http) {
     }
     $scope.Month = months[current].month;
 
-    $scope.currentmonth = Array.from(
-      { length: leapYear(year, current, months[current].days) },
-      (_, i) => i + 1
-    );
-    if (current == 0) {
-      prvsmonth = 11;
-    } else {
-      prvsmonth = current - 1;
-    }
-    $scope.lastmonth = listOfLastDates(
-      year,
-      current,
-      months[current].days,
-      months[prvsmonth].days,
-      months
-    );
-    $scope.nextmonth = listOfNextDates(
-      year,
-      current,
-      months[current].days,
-      months
-    );
+    listOfMonths(year, current, months[current].days, months);
   };
+
+  // old month is triggered when the left arrow is clicked to go to the previous month
+
   $scope.oldmonth = function () {
     current = current - 1;
     if (current == -1) {
@@ -144,24 +164,13 @@ app.controller("CalendarCtrl", function ($scope, $http) {
       $scope.Year = year;
     }
     $scope.Month = months[current].month;
-    $scope.currentmonth = Array.from(
-      { length: leapYear(year, current, months[current].days) },
-      (_, i) => i + 1
-    );
-    $scope.lastmonth = listOfLastDates(
-      year,
-      current,
-      months[current].days,
-      months[current - 1].days,
-      months
-    );
-    $scope.nextmonth = listOfNextDates(
-      year,
-      current,
-      months[current].days,
-      months
-    );
+
+    listOfMonths(year, current, months[current].days, months);
   };
+
+  // reserve is called when the user clicks on the date of the current month to book a slot.
+  // Depending on the data, it will either show a booked slot or will ask for input.
+
   $scope.reserve = function (dates, Month) {
     var book = document.getElementById("booking");
     book.style.visibility = "visible";
@@ -179,7 +188,6 @@ app.controller("CalendarCtrl", function ($scope, $http) {
           $scope.dayOfReservation + ", " + year + " 23:59:59"
         ).getTime() / 1000
       ).toString();
-
     $http
       .get(url)
       .then(function (response) {
@@ -203,12 +211,21 @@ app.controller("CalendarCtrl", function ($scope, $http) {
             "hidden";
           document.getElementById("input").style.visibility = "visible";
           document.getElementById("button").style.backgroundColor = "#00ff00";
+          time = Math.floor(
+            new Date(
+              $scope.dayOfReservation + ", " + year + " 23:59:58"
+            ).getTime() / 1000
+          );
         }
       })
       .catch(function (error) {
         console.log(error);
       });
   };
+
+  // submit is called when the user clicks on the button and depending on what the state is, executes the respective post command
+  // If there is an error a popup message comes up describing the error.
+
   $scope.submit = function (tennantname) {
     var book = document.getElementById("booking");
     book.style.visibility = "hidden";
@@ -217,11 +234,6 @@ app.controller("CalendarCtrl", function ($scope, $http) {
     var stay = false;
     if (state == "Confirm Stay") {
       stay = true;
-      time = Math.floor(
-        new Date(
-          $scope.dayOfReservation + ", " + year + " 23:59:58"
-        ).getTime() / 1000
-      );
       $scope.tennantname = "";
     }
     console.log(time);
