@@ -218,11 +218,13 @@ app.controller("CalendarCtrl", function ($scope, $http) {
     if (state == "Confirm Stay") {
       stay = true;
       time = Math.floor(
-        new Date($scope.dayOfReservation + ", " + year).getTime() / 1000
+        new Date(
+          $scope.dayOfReservation + ", " + year + " 23:59:58"
+        ).getTime() / 1000
       );
       $scope.tennantname = "";
     }
-
+    console.log(time);
     $http({
       method: "POST",
       url: "/reserve",
