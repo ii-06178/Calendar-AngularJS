@@ -50,9 +50,10 @@ app.controller("CalendarCtrl", function ($scope, $http) {
       days: 31,
     },
   ];
-  var current = 4;
-  var year = 2023;
+  var current = 11;
+  var year = 2019;
   var state = "Confirm Stay";
+  var time = 0;
   function leapYear(year, month, days) {
     if (year % 4 == 0) {
       if (month == 1) {
@@ -66,8 +67,9 @@ app.controller("CalendarCtrl", function ($scope, $http) {
     sd = months[month].month + " 1, " + year.toString();
     startDate = new Date(sd);
     startDay = startDate.getDay();
+    console.log(startDay);
     return Array.from(
-      { length: startDay - 1 },
+      { length: startDay },
       (_, i) => lastMonthDays - i
     ).reverse();
   }
@@ -76,7 +78,7 @@ app.controller("CalendarCtrl", function ($scope, $http) {
     ed = months[month].month + " " + end + ", " + year.toString();
     endDate = new Date(ed);
     endDay = endDate.getDay();
-    left = 7 - endDay;
+    left = 6 - endDay;
     console.log(left);
     days = Array.from({ length: left }, (_, i) => i + 1);
     console.log(days);
@@ -84,6 +86,7 @@ app.controller("CalendarCtrl", function ($scope, $http) {
   }
   $scope.Month = months[current].month;
   $scope.Year = year;
+  $scope.Staying = state;
   $scope.currentmonth = Array.from(
     { length: leapYear(year, current, months[current].days) },
     (_, i) => i + 1
@@ -114,11 +117,16 @@ app.controller("CalendarCtrl", function ($scope, $http) {
       { length: leapYear(year, current, months[current].days) },
       (_, i) => i + 1
     );
+    if (current == 0) {
+      prvsmonth = 11;
+    } else {
+      prvsmonth = current - 1;
+    }
     $scope.lastmonth = listOfLastDates(
       year,
       current,
       months[current].days,
-      months[current - 1].days,
+      months[prvsmonth].days,
       months
     );
     $scope.nextmonth = listOfNextDates(
@@ -158,18 +166,69 @@ app.controller("CalendarCtrl", function ($scope, $http) {
     var book = document.getElementById("booking");
     book.style.visibility = "visible";
     $scope.dayOfReservation = Month + " " + dates.toString();
+    var url =
+      "/reserve/" +
+      Math.floor(
+        new Date(
+          $scope.dayOfReservation + ", " + year + " 00:00:00"
+        ).getTime() / 1000
+      ).toString() +
+      "/" +
+      Math.floor(
+        new Date(
+          $scope.dayOfReservation + ", " + year + " 23:59:59"
+        ).getTime() / 1000
+      ).toString();
+
+    $http
+      .get(url)
+      .then(function (response) {
+        console.log(url);
+        var reserved = response.data.reserved;
+        if (reserved.length > 0) {
+          console.log(reserved);
+          state = "Cancel Stay";
+          $scope.Staying = state;
+          document.getElementById("tennantreserved").style.visibility =
+            "visible";
+          document.getElementById("input").style.visibility = "hidden";
+          document.getElementById("button").style.backgroundColor = "#ff0000";
+          $scope.reservedtennant = reserved[0].tennantName;
+          time = reserved[0].time;
+        } else {
+          console.log(reserved);
+          state = "Confirm Stay";
+          $scope.Staying = state;
+          document.getElementById("tennantreserved").style.visibility =
+            "hidden";
+          document.getElementById("input").style.visibility = "visible";
+          document.getElementById("button").style.backgroundColor = "#00ff00";
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   };
   $scope.submit = function (tennantname) {
     var book = document.getElementById("booking");
     book.style.visibility = "hidden";
-    console.log(tennantname);
-    console.log(new Date($scope.dayOfReservation + ", " + year));
+    document.getElementById("tennantreserved").style.visibility = "hidden";
+    document.getElementById("input").style.visibility = "hidden";
+    var stay = false;
+    if (state == "Confirm Stay") {
+      stay = true;
+      time = Math.floor(
+        new Date($scope.dayOfReservation + ", " + year).getTime() / 1000
+      );
+      $scope.tennantname = "";
+    }
+
     $http({
       method: "POST",
       url: "/reserve",
       data: {
-        time: new Date($scope.dayOfReservation + ", " + year).valueOf(),
-        reserved: true,
+        time: time,
+        reserved: stay,
         tennantName: tennantname,
       },
     }).then(
@@ -177,7 +236,7 @@ app.controller("CalendarCtrl", function ($scope, $http) {
         console.log("success");
       },
       function errorCallback(response) {
-        console.log("failure");
+        console.log(response);
       }
     );
   };

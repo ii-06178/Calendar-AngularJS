@@ -51,9 +51,12 @@ body {
   color: #d9d7d7;
 }
 .confirm {
-  background-color: darkseagreen;
+  background-color: #00ff00;
 }
 .booking button {
   justify-content: center;
   align-items: center;
+}
+.reserved {
+  visibility: hidden;
 }

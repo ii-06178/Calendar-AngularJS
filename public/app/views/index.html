@@ -28,13 +28,13 @@
         </div>
         <div class="date">
           <ul>
+            <li class="day">Sunday</li>
             <li class="day">Monday</li>
             <li class="day">Tuesday</li>
             <li class="day">Wednesday</li>
             <li class="day">Thursday</li>
             <li class="day">Friday</li>
             <li class="day">Saturday</li>
-            <li class="day">Sunday</li>
           </ul>
           <ul class="dates">
             <li class="inactive" ng-repeat="dates in lastmonth">{{dates}}</li>
@@ -49,7 +49,7 @@
         </div>
       </div>
       <div class="booking" id="booking">
-        <div>
+        <div id="input">
           <span>Tenant Name: </span>
           <input
             type="text"
@@ -58,11 +58,16 @@
           />
         </div>
         <div>
+          <span class="reserved" id="tennantreserved"
+            >Tenant Name: {{reservedtennant}}
+          </span>
+        </div>
+        <div>
           <span>Day: {{dayOfReservation}}</span>
         </div>
 
-        <button class="confirm" ng-click="submit(tennantname)">
-          Confirm Stay
+        <button class="confirm" ng-click="submit(tennantname)" id="button">
+          {{Staying}}
         </button>
       </div>
     </div>

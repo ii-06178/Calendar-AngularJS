@@ -31,9 +31,7 @@ function send(response, data) {
 
 // End-point to get booked nights
 // * start and end are integers (seconds since Unix epoch)
-app.get("*", function (request, response) {
-  response.sendFile(path.join(__dirname + "/public/app/views/index.html"));
-});
+
 app.get("/reserve/:start/:end", function (request, response) {
   var start = parseInt(request.params.start);
   var end = parseInt(request.params.end);
@@ -53,7 +51,9 @@ app.get("/reserve/:start/:end", function (request, response) {
     reserved: reserved,
   });
 });
-
+app.get("*", function (request, response) {
+  response.sendFile(path.join(__dirname + "/public/app/views/index.html"));
+});
 // End-point to change
 app.post("/reserve", function (request, response) {
   var body = request.body;
