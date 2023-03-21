@@ -226,38 +226,44 @@ app.controller("CalendarCtrl", function ($scope, $http) {
 
   $scope.submit = function (tennantname) {
     var book = document.getElementById("booking");
-    book.style.visibility = "hidden";
-    document.getElementById("tennantreserved").style.visibility = "hidden";
-    document.getElementById("input").style.visibility = "hidden";
-    var stay = false;
-    if (state == "Confirm Stay") {
-      stay = true;
-      $scope.tennantname = "";
-    }
-    $http({
-      method: "POST",
-      url: "/reserve",
-      data: {
-        time: time,
-        reserved: stay,
-        tennantName: tennantname,
-      },
-    }).then(
-      function successCallback(response) {
-        if (state == "Confirm Stay") {
-          $scope.error = "Slot successfully Added";
-        } else {
-          $scope.error = "Slot successfully Removed";
-        }
-        var popup = document.getElementById("myPopup");
-        popup.classList.toggle("show");
-      },
-      function errorCallback(response) {
-        err = response.data;
-        $scope.error = err;
-        var popup = document.getElementById("myPopup");
-        popup.classList.toggle("show");
+    if (state == "Confirm Stay" && !$scope.tennantname) {
+      $scope.error = "Please enter Name";
+      var popup = document.getElementById("myPopup");
+      popup.classList.toggle("show");
+    } else {
+      book.style.visibility = "hidden";
+      document.getElementById("tennantreserved").style.visibility = "hidden";
+      document.getElementById("input").style.visibility = "hidden";
+      var stay = false;
+      if (state == "Confirm Stay") {
+        stay = true;
+        $scope.tennantname = "";
       }
-    );
+      $http({
+        method: "POST",
+        url: "/reserve",
+        data: {
+          time: time,
+          reserved: stay,
+          tennantName: tennantname,
+        },
+      }).then(
+        function successCallback(response) {
+          if (state == "Confirm Stay") {
+            $scope.error = "Slot successfully Added";
+          } else {
+            $scope.error = "Slot successfully Removed";
+          }
+          var popup = document.getElementById("myPopup");
+          popup.classList.toggle("show");
+        },
+        function errorCallback(response) {
+          err = response.data;
+          $scope.error = err;
+          var popup = document.getElementById("myPopup");
+          popup.classList.toggle("show");
+        }
+      );
+    }
   };
 });
