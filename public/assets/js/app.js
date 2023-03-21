@@ -238,7 +238,11 @@ app.controller("CalendarCtrl", function ($scope, $http) {
         console.log("success");
       },
       function errorCallback(response) {
-        console.log(response);
+        err = response.data;
+        console.log(err);
+        $scope.error = err;
+        var popup = document.getElementById("myPopup");
+        popup.classList.toggle("show");
       }
     );
   };
