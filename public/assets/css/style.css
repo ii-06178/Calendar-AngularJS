@@ -60,6 +60,7 @@ body {
 .reserved {
   visibility: hidden;
 }
+/* This code was taken from W3 School with some changes */
 /* Popup container */
 .popup {
   position: relative;
