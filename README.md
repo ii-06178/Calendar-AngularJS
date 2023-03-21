@@ -13,5 +13,6 @@
 4) Name cannot be empty.
 5) After clicking on confirm stay, the box will disappear and you can see your reservation when  you click on the date again
 6) After clicking on a date with a reserved slot, you will now have the option to cancel your stay by clicking on the button.
+
 ![Cancel Stay](images/CancelStay.jpeg)
 7) If a slot is booked or removed from another instance, a popup will appear to notify about it.
