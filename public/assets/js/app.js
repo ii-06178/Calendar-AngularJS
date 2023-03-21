@@ -168,7 +168,7 @@ app.controller("CalendarCtrl", function ($scope, $http) {
     listOfMonths(year, current, months[current].days, months);
   };
 
-  // reserve is called when the user clicks on the date of the current month to book a slot.
+  // reserve is called when the user clicks on the date of the current month to book a slot. A box will appear.
   // Depending on the data, it will either show a booked slot or will ask for input.
 
   $scope.reserve = function (dates, Month) {
@@ -191,10 +191,8 @@ app.controller("CalendarCtrl", function ($scope, $http) {
     $http
       .get(url)
       .then(function (response) {
-        console.log(url);
         var reserved = response.data.reserved;
         if (reserved.length > 0) {
-          console.log(reserved);
           state = "Cancel Stay";
           $scope.Staying = state;
           document.getElementById("tennantreserved").style.visibility =
@@ -204,7 +202,6 @@ app.controller("CalendarCtrl", function ($scope, $http) {
           $scope.reservedtennant = reserved[0].tennantName;
           time = reserved[0].time;
         } else {
-          console.log(reserved);
           state = "Confirm Stay";
           $scope.Staying = state;
           document.getElementById("tennantreserved").style.visibility =
@@ -225,6 +222,7 @@ app.controller("CalendarCtrl", function ($scope, $http) {
 
   // submit is called when the user clicks on the button and depending on what the state is, executes the respective post command
   // If there is an error a popup message comes up describing the error.
+  // If it was a success a popup message comes to tell that is has been sucessfully done.
 
   $scope.submit = function (tennantname) {
     var book = document.getElementById("booking");
@@ -236,7 +234,6 @@ app.controller("CalendarCtrl", function ($scope, $http) {
       stay = true;
       $scope.tennantname = "";
     }
-    console.log(time);
     $http({
       method: "POST",
       url: "/reserve",
@@ -247,11 +244,16 @@ app.controller("CalendarCtrl", function ($scope, $http) {
       },
     }).then(
       function successCallback(response) {
-        console.log("success");
+        if (state == "Confirm Stay") {
+          $scope.error = "Slot successfully Added";
+        } else {
+          $scope.error = "Slot successfully Removed";
+        }
+        var popup = document.getElementById("myPopup");
+        popup.classList.toggle("show");
       },
       function errorCallback(response) {
         err = response.data;
-        console.log(err);
         $scope.error = err;
         var popup = document.getElementById("myPopup");
         popup.classList.toggle("show");
